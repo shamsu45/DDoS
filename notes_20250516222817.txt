@@ -1,4 +1,3 @@
-05.16 10:28 PM
 import sys
 import os
 import time
